@@ -11,17 +11,16 @@
 // THEN the text for that event is saved in local storage
 // WHEN I refresh the page
 // THEN the saved events persist
-$(function () {
+
+$(function () { //wraps the entire code in a call to jQuery to ensure that this is read after the the elements of the html page is rendered
   var dateTime = $('#currentDay');
   var saveBtns = $('.saveBtn');//all of the save btns
 
   var hoursContainer = $('.container-lg');//container that holds each hour's id
-  var hourToDo = $('.description'); //each hour block's text box
-  var timeBlock = $('.time-block');
-  var hourDivs = Array.from(hoursContainer.children());
-  var hourTextBox = Array.from(hourToDo.children());
+  var timeBlock = $('.time-block'); //each time block
 
-  var nowhr = dayjs().format('H'); // just the current hr 
+
+  var nowhr = parseInt(dayjs().format('H')); // just the current hr conv to integer
   // console.log(nowhr);
   function dateTimeDisplay() {
     var now = dayjs().format("dddd, MMMM DD");
@@ -29,38 +28,46 @@ $(function () {
     checkHour();
   };
 
-
   function checkHour() {
-    //hourDivs is the container that holds all of the time blocks, .each tells the function to iterate through each item in the container.
-    $(hourDivs).each(function () {
-      if (nowhr === parseInt(this.id.split("hour-")[1])) { //"this" is referring to each time block in the container, .id is an attribute that will pull just the id of each time block, then splitting the "hour-" from the id and making it into an integer allows nowhr to be compared to the individual hour ids. split helps us get rid of "hour-" but returns an array, which is why we need to specify the index of 1 bc that is where the number is held.
-        $(this).addClass("present")
+    //timeBlock is the array that holds all of the time blocks, .each tells the function to iterate through each item
+    // in the array.
+    $(timeBlock).each(function () {
+      if (nowhr == (this.id.split("hour-")[1])) { //"this" is referring to the time block in the container, 
+        //.id is an attribute of timeBlock that will pull just the id of each time block, then we can split the "hour-" 
+        //from the id, to turn it into an integer allowing nowhr to be compared to the individual 
+        //hour ids. split helps us get rid of "hour-" but returns an array, which is why we need to specify the index 
+        //of 1 bc that is where the number is held.
+        $(this).addClass("present")//if the condition is true, then the appropriate class is added to "this" time block
       }
-      if (nowhr < parseInt(this.id.split("hour-")[1])) {
+      if (nowhr < (this.id.split("hour-")[1])) {
         $(this).addClass("future")
       }
-      if (nowhr > parseInt(this.id.split("hour-")[1])) {
+      if (nowhr > (this.id.split("hour-")[1])) {
         $(this).addClass("past")
-      }
-    })
-  };
+      } //console.log((nowhr), parseInt(this.id.split("hour-")[1])); logs current hour as an integer and the hour id as an integer
+    }) 
+  }; 
 
-  $(timeBlock).each(function() {
-    
-  });
+  //load stuff in fr local storage
+  function savedToDos () {
+    $(timeBlock).each(function() {
+      //individual description box text is pulled from the local storage of this timeBlock's id
+      //I'd previously made a var hourToDo = $('.description'), but when I used the var name in the line below, it displayed the hour todo text twice and removed the hour... why?
+      $(this).children('.description').text(localStorage.getItem($(this).attr('id')));
+      console.log(localStorage.getItem($(this).attr('id')));
+      console.log($(this).children('.description'));
+    })
+  }
 
   $(saveBtns).on('click', function () {
     var description = $(this).siblings('.description').val();
     var time = $(this).parent().attr("id");
     localStorage.setItem(time, description);
-    displayToDo();
   });
 
   dateTimeDisplay();
+  savedToDos();
 });
-
-
-
 
 
 // Wrap all code that interacts with the DOM in a call to jQuery to ensure that
@@ -87,29 +94,3 @@ $(function () {
 //   // TODO: Add code to display the current date in the header of the page.
 // });
 
-
-
-// var nowhr = dayjs().format('hA'); // just the current hr + AM, will be using this var to compare
-// // console.log(nowhr);
-// function dateTimeDisplay() {
-//   var now = dayjs().format("dddd, MMMM DD");
-//   dateTime.text(now);
-//   checkHour();
-// }
-
-// //why is 9 am not classing correctly, but if i change 9AM to 10AM, it applies correctly; also added an 8am and it was assigned the same class as 9am
-// function checkHour() {
-//   for(var i = 0; i < hourNum.length; i++) {
-//     if (nowhr === hourNum[i].innerHTML) {
-//       $(hourNum[i]).parent().addClass("present");
-//     }
-//     if (nowhr > hourNum[i].innerHTML) {
-//       $(hourNum[i]).parent().addClass("past");
-//     } 
-//     else if (nowhr < hourNum[i].innerHTML) {
-//       $(hourNum[i]).parent().addClass("future"); 
-//     }
-//     console.log(nowhr, hourNum[i].innerHTML);
-//     console.log(nowhr < hourNum[i].innerHTML);
-//   }
-// }
