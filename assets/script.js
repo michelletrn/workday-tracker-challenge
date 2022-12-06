@@ -11,61 +11,56 @@
 // THEN the text for that event is saved in local storage
 // WHEN I refresh the page
 // THEN the saved events persist
+$(function () {
+  var dateTime = $('#currentDay');
+  var saveBtns = $('.saveBtn');//all of the save btns
 
-var dateTime = $('#currentDay');
-var saveBtns = $('.saveBtn');//all of the save btns
+  var hoursContainer = $('.container-lg');//container that holds each hour's id
+  var hourToDo = $('.description'); //each hour block's text box
+  var timeBlock = $('.time-block');
+  var hourDivs = Array.from(hoursContainer.children());
+  var hourTextBox = Array.from(hourToDo.children());
 
-var hoursContainer = $('.container-lg');//container that holds each hour's id
-var hourBlock = $('.time-block'); //individual hour blocks
-var hourToDo = $('.description'); //each hour block's text box
-var past = $('.past');
-var present = $('.present');
-var future = $('.future');
-var hourNum = $('.hour'); //same line as the time number
-
-//each hour block's unique id, incase
-var nine = $('#hour-9');
-var ten = $('#hour-10');
-var eleven = $('#hour-11');
-var twelve = $('#hour-12');
-var one = $('#hour-1');
-var two = $('#hour-2');
-var three = $('#hour-3');
-var four = $('#hour-4');
-var five = $('#hour-5');
+  var nowhr = dayjs().format('H'); // just the current hr 
+  // console.log(nowhr);
+  function dateTimeDisplay() {
+    var now = dayjs().format("dddd, MMMM DD");
+    dateTime.text(now);
+    checkHour();
+  };
 
 
-var nowhr = dayjs().format('hA'); // just the current hr + AM, will be using this var to compare
-// console.log(nowhr);
-function dateTimeDisplay() {
-  var now = dayjs().format("dddd, MMMM DD");
-  dateTime.text(now);
-  checkHour();
-}
+  function checkHour() {
+    //hourDivs is the container that holds all of the time blocks, .each tells the function to iterate through each item in the container.
+    $(hourDivs).each(function () {
+      if (nowhr === parseInt(this.id.split("hour-")[1])) { //"this" is referring to each time block in the container, .id is an attribute that will pull just the id of each time block, then splitting the "hour-" from the id and making it into an integer allows nowhr to be compared to the individual hour ids. split helps us get rid of "hour-" but returns an array, which is why we need to specify the index of 1 bc that is where the number is held.
+        $(this).addClass("present")
+      }
+      if (nowhr < parseInt(this.id.split("hour-")[1])) {
+        $(this).addClass("future")
+      }
+      if (nowhr > parseInt(this.id.split("hour-")[1])) {
+        $(this).addClass("past")
+      }
+    })
+  };
 
-//why is 9 am not classing correctly, but if i change 9AM to 10AM, it applies correctly; also added an 8am and it was assigned the same class as 9am
-function checkHour() {
-  for(var i = 0; i < hourNum.length; i++) {
-    if (nowhr === hourNum[i].innerHTML) {
-      $(hourNum[i]).parent().addClass("present");
-    }
-    if (nowhr > hourNum[i].innerHTML) {
-      $(hourNum[i]).parent().addClass("past");
-    } 
-    else if (nowhr < hourNum[i].innerHTML) {
-      $(hourNum[i]).parent().addClass("future"); 
-    }
-    console.log(nowhr, hourNum[i].innerHTML);
-    console.log(nowhr > hourNum[i].innerHTML);
-  }
-}
+  $(timeBlock).each(function() {
+    
+  });
 
+  $(saveBtns).on('click', function () {
+    var description = $(this).siblings('.description').val();
+    var time = $(this).parent().attr("id");
+    localStorage.setItem(time, description);
+    displayToDo();
+  });
+
+  dateTimeDisplay();
+});
 
 
 
-
-
-dateTimeDisplay();
 
 
 // Wrap all code that interacts with the DOM in a call to jQuery to ensure that
@@ -91,3 +86,30 @@ dateTimeDisplay();
 //   //
 //   // TODO: Add code to display the current date in the header of the page.
 // });
+
+
+
+// var nowhr = dayjs().format('hA'); // just the current hr + AM, will be using this var to compare
+// // console.log(nowhr);
+// function dateTimeDisplay() {
+//   var now = dayjs().format("dddd, MMMM DD");
+//   dateTime.text(now);
+//   checkHour();
+// }
+
+// //why is 9 am not classing correctly, but if i change 9AM to 10AM, it applies correctly; also added an 8am and it was assigned the same class as 9am
+// function checkHour() {
+//   for(var i = 0; i < hourNum.length; i++) {
+//     if (nowhr === hourNum[i].innerHTML) {
+//       $(hourNum[i]).parent().addClass("present");
+//     }
+//     if (nowhr > hourNum[i].innerHTML) {
+//       $(hourNum[i]).parent().addClass("past");
+//     } 
+//     else if (nowhr < hourNum[i].innerHTML) {
+//       $(hourNum[i]).parent().addClass("future"); 
+//     }
+//     console.log(nowhr, hourNum[i].innerHTML);
+//     console.log(nowhr < hourNum[i].innerHTML);
+//   }
+// }
